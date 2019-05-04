@@ -37,7 +37,9 @@ nmcli c
 
 # judge if the connection is saved
 # quotes are necessary.
-SSID=$ConnectedSSID
+if [ -z "$SSID" ] ; then
+	SSID=$ConnectedSSID
+fi
 if [ -n "$SSID" ] ; then
 	HasSaved=`nmcli c | grep -w $SSID`
 	echo
