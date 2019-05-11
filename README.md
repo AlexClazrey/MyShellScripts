@@ -5,7 +5,7 @@ Currently I have three.
 
 ## wifiReset.sh
 
-Persuming you are using the [8723bu][1] driver, it can get you out of random realtek wireless adapter re-connecting issues, at least, for now.
+Assuming you are using the [8723bu][1] driver, it can get you out of random realtek wireless adapter re-connecting issues, at least, for now.
 
 ## gnomeReset.sh
 
