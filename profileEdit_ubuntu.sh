@@ -20,11 +20,11 @@ if [ -z "$YARN" ]; then
 	YARNPATH='$HOME/.yarn/bin'
 else
 	# otherwise use its config
-	YARNPATH=`yarn local bin`
+	YARNPATH=`yarn global bin`
 fi
 ADDYARN="if [ -z \"$YARNPATH\" ]; then\n\tPATH=\"$YARNPATH:\$PATH\"\nfi"
-if [ -z "$(echo $PATH | grep $YARNPATH)" ] \
-	&& [ -z "$(cat ~/.profile | grep $YARNPATH)" ]; then
+if [ -z "$(echo $PATH | grep "$YARNPATH")" ] \
+	&& [ -z "$(cat ~/.profile | grep "$YARNPATH")" ]; then
 	# echo -e interprets backslash
 	echo "---- .profile content start ----"
 	echo "" | tee -a ~/.profile
