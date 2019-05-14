@@ -22,7 +22,7 @@ else
 	# otherwise use its config
 	YARNPATH=`yarn global bin`
 fi
-ADDYARN="if [ -z \"$YARNPATH\" ]; then\n\tPATH=\"$YARNPATH:\$PATH\"\nfi"
+ADDYARN="if [ -d \"$YARNPATH\" ]; then\n\tPATH=\"$YARNPATH:\$PATH\"\nfi"
 if [ -z "$(echo $PATH | grep "$YARNPATH")" ] \
 	&& [ -z "$(cat ~/.profile | grep "$YARNPATH")" ]; then
 	# echo -e interprets backslash
