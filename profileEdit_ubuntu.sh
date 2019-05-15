@@ -71,7 +71,7 @@ if [ -z "$(command -v he)" ]; then
 	echo "Usage: he <command-name> <an option>"
 	# check if ~/.local/bin/he exists.
 	HELOCA="~/.local/bin/he" 
-	if [ -f "$HELOCA" ] || [ -d "$HELOCA" ]; then
+	if [ -e "$HELOCA" ]; then
 		echo "~/.local/bin/he exists, I will not overwrite it."
 		echo "Skipping..."
 	else
