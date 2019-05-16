@@ -17,7 +17,7 @@ PORT="<ftp port>"
 USER="<user>"
 PASS="<pass>"
 # copy destination
-DEST="~/Pictures"
+DEST=~/"Pictures"
 PICFILE="*.jpg"
 VIDFILE="*.mp4"
 END
