@@ -5,7 +5,9 @@
 
 TODAY=`date "+%Y-%m-%d"`
 TMPDIR="/tmp/profileEdit"
-RELEASE=`lsb_release -r | cut -f 2`
+RELEASE=`lsb_release -rs`
+APTUPDATE=0
+LOGINAGAIN=0
 
 mkdir -p $TMPDIR
 source ~/.profile
@@ -31,7 +33,7 @@ if [ -z "$(echo $PATH | grep "$YARNPATH")" ] \
 	echo "# $TODAY: add yarn global package location to path." | tee -a ~/.profile
 	echo -e $ADDYARN | tee -a ~/.profile
 	echo "----- .profile content end -----"
-	echo
+	LOGINAGAIN=1
 else
 	echo "You have yarn global package location in \$PATH."
 	echo "Skipping..."
@@ -46,6 +48,7 @@ if [ -z "$(command -v path)" ]; then
 	# leave a little space before single quote for auto-highlighting to work properly in vim
 	echo "alias path='echo \$PATH | tr \":\" \"\n\" '" | tee -a ~/.bashrc
 	echo "----- .bashrc content end -----"
+	LOGINAGAIN=1
 else
 	echo "You have command 'path' in presence."
 	echo "I will not overwrite it."
@@ -59,6 +62,7 @@ if [[ "$HISTSIZE" -lt 3000 ]]; then
 	# read `info sed` to find a way to edit .bashrc file decently.
 	sed -i -E 's/^HISTSIZE=[0-9]+/HISTSIZE=3000/' ~/.bashrc
 	sed -i -E 's/^HISTFILESIZE=[0-9]+/HISTFILESIZE=6000/' ~/.bashrc
+	LOGINAGAIN=1
 else
 	echo "Your history size is larger than 3000."
 	echo "Skipping..."
@@ -102,7 +106,7 @@ else
 	echo "You have added Yarn package source to apt."
 	echo "Skipping..."
 fi
-MYSQL=`dpkg -l mysql-apt-config*`
+MYSQL=`dpkg -l mysql-apt-config 2>/dev/null`
 if [[ $? -eq 0 ]]; then
 	echo "You have installed mysql-apt-config."
 	echo "Skipping..."
@@ -112,6 +116,25 @@ else
 	SQLURL="https://repo.mysql.com/$SQLDEBNAME"
 	wget -P $TMPDIR $SQLURL 
 	sudo dpkg -i $TMPDIR/$SQLDEBNAME	
+fi
+MONGO=`dpkg -l mongodb-org 2>/dev/null`
+if [[ $? -eq 0 ]]; then
+	echo "You have added source of MongoDB Community Edition."
+	echo "Skipping..."
+else
+	echo "Adding package source of MongoDB Community Edition..."
+	sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+	var=$(awk 'BEGIN{ print "'18.04'"<="'$RELEASE'" }')
+	if [[ "$var" -eq 1 ]]; then
+		echo "---- /etc/apt/sources.list.d/mongodb-org-4.0.list content start ----"
+		echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+		echo "----- /etc/apt/sources.list.d/mongodb-org-4.0.list content end -----"
+		APTUPDATE=1
+	else
+		echo "[Info] Your Ubuntu Version is lower than 18.04."
+		echo "[Info] You need to add package source yourself."
+		echo "[Info] Check https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/ for the process."
+	fi
 fi
 echo
 
@@ -127,9 +150,9 @@ fi
 # check if release larger then 18.10 - bash doesn't do floats
 var=$(awk 'BEGIN{ print "'18.10'"<"'$RELEASE'" }')
 if [[ "$var" -eq 1 ]]; then
-	echo "[INFO] Fsearch does not have official build for release upper than 18.10."
-	echo "[INFO] You need to build it yourself."
-	echo "[INFO] Read https://github.com/cboxdoerfer/fsearch/wiki/Build-instructions for details."
+	echo "[Info] Fsearch does not have official build for release upper than 18.10."
+	echo "[Info] You need to build it yourself."
+	echo "[Info] Read https://github.com/cboxdoerfer/fsearch/wiki/Build-instructions for details."
 	echo "Skipping..."
 else
 	FSE=`apt search ^fsearch$ 2>/dev/null | grep fsearch`
@@ -143,8 +166,16 @@ else
 fi
 echo
 
+if [[ $APTUPDATE -eq 1 ]]; then
+	echo "Run apt update..."
+	sudo apt update
+fi
+
 rm -rf $TMPDIR
 
 echo "Finished!"
-echo "You need to login again for changes to take effect."
+
+if [[ $LOGINAGAIN -eq 1 ]]; then
+	echo "You need to login again for changes to take effect."
+fi
 
