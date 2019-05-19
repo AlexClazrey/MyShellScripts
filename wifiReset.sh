@@ -65,9 +65,9 @@ echo
 echo 'Disabling and re-enabling wifi...'
 nmcli radio wifi off
 nmcli radio wifi on
-# wait 2 seconds for device to init
-echo 'Wait 2 seconds for initiating device...'
-sleep 2s
+# wait 3 seconds for device to init
+echo 'Wait 3 seconds for initiating device...'
+sleep 3s
 # list connections
 echo
 echo 'Here are your saved connections:'
